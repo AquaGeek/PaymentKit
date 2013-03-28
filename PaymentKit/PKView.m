@@ -94,7 +94,7 @@
     [self addSubview:self.innerView];
     [self addSubview:self.placeholderView];
     
-    [self stateCardNumber];
+    [self stateCardNumber:NO];
 }
 
 
@@ -178,6 +178,11 @@
 
 - (void)stateCardNumber
 {
+    [self stateCardNumber:YES];
+}
+
+- (void)stateCardNumber:(BOOL)becomeFirstResponder
+{
     if (!_isInitialState) {
         // Animate left
         _isInitialState = YES;
@@ -209,10 +214,18 @@
                          }];
     }
     
-    [self.cardNumberField becomeFirstResponder];
+    if (becomeFirstResponder)
+    {
+        [self.cardNumberField becomeFirstResponder];
+    }
 }
 
 - (void)stateMeta
+{
+    [self stateMeta:YES];
+}
+
+- (void)stateMeta:(BOOL)becomeFirstResponder
 {
     _isInitialState = NO;
     
@@ -242,7 +255,11 @@
     [self addSubview:self.placeholderView];
     [self.innerView addSubview:self.cardExpiryField];
     [self.innerView addSubview:self.cardCVCField];
-    [self.cardExpiryField becomeFirstResponder];
+    
+    if (becomeFirstResponder)
+    {
+        [self.cardExpiryField becomeFirstResponder];
+    }
 }
 
 - (void)stateCardCVC
@@ -354,6 +371,15 @@
     
     if ([textField isEqual:self.cardNumberField] && !_isInitialState) {
         [self stateCardNumber];
+    }
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+    // If the card number is valid and the card number field is losing focus, ensure we're showing the meta info
+    if (textField == self.cardNumberField && [self.cardNumber isValid] && _isInitialState)
+    {
+        [self stateMeta:NO];
     }
 }
 
